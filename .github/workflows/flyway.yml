@@ -1,0 +1,27 @@
+name: Flyway CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Install Flyway
+      run: |
+        wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/11.20.3/flyway-commandline-11.20.3-linux-x64.tar.gz
+        tar -xzf flyway-commandline-11.20.3-linux-x64.tar.gz
+        sudo mv flyway-11.20.3 /opt/flyway
+        sudo ln -s /opt/flyway/flyway /usr/local/bin/flyway
+
+    - name: Run Flyway migrations
+      run: |
+        flyway -url="jdbc:sqlserver://192.168.1.1:1433;databaseName=DemoDB;trustServerCertificate=true" \
+               -user="${{ secrets.DB_USER }}" \
+               -password="${{ secrets.DB_PASSWORD }}" \
+               migrate
