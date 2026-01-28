@@ -27,6 +27,14 @@ jobs:
         run: |
           ./flyway-12.0.0/flyway -url="$FLYWAY_URL" -user="$FLYWAY_USER" -password="$FLYWAY_PASSWORD" validate
 
+      - name: Flyway Info
+        env:
+          FLYWAY_URL: ${{ secrets.FLYWAY_URL }}
+          FLYWAY_USER: ${{ secrets.FLYWAY_USER }}
+          FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
+        run: |
+          ./flyway-12.0.0/flyway -url="$FLYWAY_URL" -user="$FLYWAY_USER" -password="$FLYWAY_PASSWORD" info
+
       - name: Flyway Migrate
         env:
           FLYWAY_URL: ${{ secrets.FLYWAY_URL }}
