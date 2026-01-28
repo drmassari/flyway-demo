@@ -1,0 +1,40 @@
+name: Flyway CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  flyway-migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Flyway
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget -q https://download.red-gate.com/maven/release/com/redgate/flyway-commandline/11.20.3/flyway-commandline-11.20.3-linux-x64.tar.gz
+          tar -xzf flyway-commandline-11.20.3-linux-x64.tar.gz
+          sudo mv flyway-11.20.3 /opt/flyway
+          sudo ln -s /opt/flyway/flyway /usr/local/bin/flyway
+
+      - name: Flyway Validate
+        env:
+          FLYWAY_URL: ${{ secrets.FLYWAY_URL }}
+          FLYWAY_USER: ${{ secrets.FLYWAY_USER }}
+          FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
+        run: |
+          flyway -url="$FLYWAY_URL" -user="$FLYWAY_USER" -password="$FLYWAY_PASSWORD" validate
+
+      - name: Flyway Migrate
+        env:
+          FLYWAY_URL: ${{ secrets.FLYWAY_URL }}
+          FLYWAY_USER: ${{ secrets.FLYWAY_USER }}
+          FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
+        run: |
+          flyway -url="$FLYWAY_URL" -user="$FLYWAY_USER" -password="$FLYWAY_PASSWORD" migrate
